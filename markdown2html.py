@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 """ Verify arguments """
-import sys
+import hashlib
 from os import path
 from string import ascii_letters
+import sys
+
 
 if __name__ == "__main__":
 	def count_d(marker):
@@ -43,6 +45,24 @@ if __name__ == "__main__":
 					line = line[:idx] + "</em>" + line[idx+2:]
 				else:
 					line = line.replace('<em>', '__')
+			# MD5 handling
+			if '[[' in line and ']]' in line:
+				st = line[line.find('[[')+2:line.find(']]')]
+				hashed = st[:].encode('utf-8')
+				m = hashlib.md5()
+				m.update(hashed)
+				hashed = m.hexdigest()
+				line = line.replace('[[','')
+				line = line.replace(']]','')
+				line = line.replace(st, hashed)
+			# "c" handling
+			if '((' in line and '))' in line:
+				st = line[line.find('((')+2:line.find('))')]
+				st_c = st.replace('c', '')
+				st_c = st_c.replace('C', '')
+				line = line.replace('((','')
+				line = line.replace('))','')
+				line = line.replace(st, st_c)
 			# </ol> handling
 			if flag == 2 and line[:1] != '*':
 				lines.append('</ol>\n')
