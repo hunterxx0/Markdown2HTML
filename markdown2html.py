@@ -25,6 +25,24 @@ if __name__ == "__main__":
 		lines = []
 		flag = 0
 		for line in f.readlines():
+			# <b> handling
+			if "**" in line:
+				idx = line.find("**")
+				line = line[:idx] + "<b>" + line[idx+2:]
+				idx = line.find("**")
+				if idx != -1:
+					line = line[:idx] + "</b>" + line[idx+2:]
+				else:
+					line = line.replace('<b>', '**')
+			# <em> handling
+			if "__" in line:
+				idx = line.find("__")
+				line = line[:idx] + "<em>" + line[idx+2:]
+				idx = line.find("__")
+				if idx != -1:
+					line = line[:idx] + "</em>" + line[idx+2:]
+				else:
+					line = line.replace('<em>', '__')
 			# </ol> handling
 			if flag == 2 and line[:1] != '*':
 				lines.append('</ol>\n')
@@ -38,26 +56,26 @@ if __name__ == "__main__":
 				c = count_d(line)
 				lines.append('<h{0}>{1}</h{0}>\n'.format(c, line[c+1:-1]))
 			# <ul> handling
-			if line[:1] == '-':
+			elif line[:1] == '-':
 				if flag == 0:
 					lines.append('<ul>\n')
 					flag = 1
 				lines.append('<li>{}</li>\n'.format(line[2:-1]))
 			# <ol> Handling
-			if line[:1] == '*':
+			elif line[:1] == '*':
 				if flag == 0:
 					lines.append('<ol>\n')
 					flag = 2
 				lines.append('<li>{}</li>\n'.format(line[2:-1]))
 			# <p> handling
-			if line[:1] in list(ascii_letters):
+			elif line[:1] in list(ascii_letters) or line[:1] == "<":
 				if flag == 3:
 					lines.append('<br />\n')
 				if flag == 0:
 					lines.append('<p>\n')
 					flag = 3
 				lines.append(line[:])
-			if line[:1] == '\n' and flag == 3:
+			elif line[:1] == '\n' and flag == 3:
 				lines.append('</p>\n')
 				flag = 0
 		if flag != 0:
